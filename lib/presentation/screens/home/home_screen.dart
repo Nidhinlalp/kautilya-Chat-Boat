@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -11,15 +10,10 @@ class MobileHomeScreen extends StatefulWidget {
 
 class _MobileHomeScreenState extends State<MobileHomeScreen> {
   double _progress = 0;
-  bool _keyboardVisible = false;
   late InAppWebViewController inAppWebViewController;
 
   @override
   Widget build(BuildContext context) {
-    _keyboardVisible = MediaQuery.of(context).viewInsets.bottom != 0;
-    log(_keyboardVisible.toString());
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
-
     return WillPopScope(
       onWillPop: () => _onBackButtonPressed(context),
       child: SafeArea(
@@ -27,13 +21,10 @@ class _MobileHomeScreenState extends State<MobileHomeScreen> {
           backgroundColor: Colors.black,
           body: Stack(
             children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 0.0),
+              SizedBox(
+                height: MediaQuery.of(context).size.height *
+                    (MediaQuery.of(context).viewInsets.bottom != 0 ? .6 : 1),
                 child: InAppWebView(
-                  // gestureRecognizers: Set()
-                  //   ..add(Factory<VerticalDragGestureRecognizer>(() =>
-                  //       VerticalDragGestureRecognizer()
-                  //         ..onDown = (details) {})),
                   initialUrlRequest: URLRequest(
                     url: Uri.parse("https://events.inspirefunclub.com/"),
                   ),
