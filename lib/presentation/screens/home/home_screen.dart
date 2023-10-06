@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:phone_app/presentation/screens/home/widget/boat_card.dart';
-import 'package:phone_app/presentation/screens/home/widget/common_intro_card.dart';
-import 'package:phone_app/presentation/screens/home/widget/user_response.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class MobileHomeScreen extends StatefulWidget {
   const MobileHomeScreen({super.key});
@@ -12,81 +10,51 @@ class MobileHomeScreen extends StatefulWidget {
 }
 
 class _MobileHomeScreenState extends State<MobileHomeScreen> {
+  double _progress = 0;
+  bool _keyboardVisible = false;
+  late InAppWebViewController inAppWebViewController;
+
   @override
   Widget build(BuildContext context) {
+    _keyboardVisible = MediaQuery.of(context).viewInsets.bottom != 0;
+    log(_keyboardVisible.toString());
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {});
+
     return WillPopScope(
       onWillPop: () => _onBackButtonPressed(context),
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF333333),
-          automaticallyImplyLeading: false,
-          title: const Text(
-            'Kautilya',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.autorenew_rounded,
-                color: Color.fromRGBO(246, 66, 54, 1),
-                size: 30,
-              ),
-            )
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return const CommonIntro();
-                  } else if (index.isOdd) {
-                    return const BootMessageCard();
-                  } else {
-                    return const UserResponse();
-                  }
-                },
-              ),
-            ),
-            SafeArea(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-                child: CupertinoTextField(
-                  placeholder: 'Kautilya can answer anything',
-                  placeholderStyle: const TextStyle(
-                    color: CupertinoColors.systemGrey4,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 0.0),
+                child: InAppWebView(
+                  // gestureRecognizers: Set()
+                  //   ..add(Factory<VerticalDragGestureRecognizer>(() =>
+                  //       VerticalDragGestureRecognizer()
+                  //         ..onDown = (details) {})),
+                  initialUrlRequest: URLRequest(
+                    url: Uri.parse("https://events.inspirefunclub.com/"),
                   ),
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 15.0,
-                    horizontal: 10,
-                  ),
-                  suffix: const Icon(
-                    Icons.send,
-                    color: CupertinoColors.systemGrey,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: CupertinoColors.systemGrey4,
-                      width: 1.0,
-                    ),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  style: const TextStyle(
-                    color: CupertinoColors.systemGrey4,
-                    fontWeight: FontWeight.normal,
-                  ),
+                  onWebViewCreated: (InAppWebViewController controller) {
+                    inAppWebViewController = controller;
+                  },
+                  onProgressChanged:
+                      (InAppWebViewController controller, int progress) {
+                    setState(() {
+                      _progress = progress / 100;
+                    });
+                  },
                 ),
               ),
-            )
-          ],
+              _progress < 1
+                  ? LinearProgressIndicator(
+                      value: _progress,
+                    )
+                  : const SizedBox(),
+            ],
+          ),
         ),
       ),
     );
