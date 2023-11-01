@@ -1,4 +1,4 @@
-# kautialya chat boat 
+# kautilya chat boat 
 
 A new Flutter project.
 
